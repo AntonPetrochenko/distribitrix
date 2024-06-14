@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import fs from 'node:fs'
 
-const secret = Uint8Array.from(fs.readFileSync('/var/run/secrets/jwt_secret.txt'));
+const secret = Uint8Array.from(fs.readFileSync('/var/run/secrets/jwt_secret'));
 const alg = 'HS256'
 
 const URN_AUTH = 'urn:distribitrix:auth'
