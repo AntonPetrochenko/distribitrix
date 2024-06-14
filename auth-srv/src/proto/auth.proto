@@ -3,9 +3,13 @@ syntax = "proto3";
 
 service User {
     rpc Auth (Credentials) returns (TokenPair) {};
-    rpc Renew(Token) returns (Token) {};
+    rpc Renew(Claim) returns (Token) {};
     
     rpc Register (Credentials) returns (TokenPair) {};
+}
+
+message Claim {
+    string login = 1;
 }
 
 message Credentials {

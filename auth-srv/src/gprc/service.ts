@@ -2,6 +2,7 @@ import Mali, { Context } from 'mali'
 import { Sequelize } from 'sequelize-typescript'
 import { Op } from 'sequelize'
 import { UserModel } from '../db/models/UserModel'
+import { issueAccess, issueRenewer, verifyRenew } from '../jwt/jwt'
 
 // Класс, представляющий наш сервис
 
@@ -16,23 +17,45 @@ class ProductService {
 
     if (foundUser && foundUser.verifyPassword(creds.password)) {
       return {
-        auth: {value: 'token here'},
-        renew: {value: 'token here'}
+        auth: {value: await issueAccess(creds.login)},
+        renew: {value: await issueRenewer(creds.login)}
       }
     }
 
     throw new Error('Unauth?')
   }
 
-  async Renew(tokenContainer: Token): Promise<Token> {
-    return {value: 'token here'}
+  async Renew(claim: Claim): Promise<Token> {
+    try {
+      const status = await verifyRenew(claim.token, claim.login)
+      // тут может быть ваша проверка на все дела...
+
+      return {
+        value: await issueAccess(claim.login)
+      }
+      
+    } catch (e) {
+      return {
+        value: 'none, sir' // у меня уже кукуха плывёт на этот момент, пусть будет так
+      }
+    }
   };
 
   async Register (creds: Credentials): Promise<TokenPair> {
+
+    const newUser = await UserModel.create({
+      name: creds.login
+    })
+
+    newUser.setPassword(creds.password)
+
+    newUser.save()
+
     return {
-      auth: {value: 'token here'},
-      renew: {value: 'token here'}
+      auth:  {value: await issueAccess(creds.login)},
+      renew: {value: await issueRenewer(creds.login)}
     }
+
   };
 
   constructor(

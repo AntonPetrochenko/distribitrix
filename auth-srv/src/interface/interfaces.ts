@@ -5,6 +5,11 @@ interface Credentials {
     password: string;
 }
 
+interface Claim {
+    login: string,
+    token: string
+}
+
 interface Token {
     value: string;
 }
