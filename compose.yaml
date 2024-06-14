@@ -1,0 +1,131 @@
+services:
+  frontend:
+    build:
+      context: ./admin-app
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+    depends_on:
+      db-products:
+        condition: service_healthy
+      db-auth:
+        condition: service_healthy
+  auth:
+    build:
+      context: ./auth-srv
+    environment:
+      NODE_ENV: production
+      DB_AUTH_PORT: ${DB_AUTH_PORT}
+      DB_AUTH_PASSWORD: ${DB_AUTH_PASSWORD}
+      DB_USER: postgres
+      DB_AUTH_HOST: db-auth
+      DB_NAME: ${DB_NAME}
+      GRPC_AUTH_PORT: ${GRPC_AUTH_PORT}
+    ports:
+      - ${GRPC_AUTH_PORT_ACCESS}:${GRPC_AUTH_PORT}
+    depends_on:
+      db-auth:
+        condition: service_healthy
+    expose:
+      - ${GRPC_AUTH_PORT}
+    secrets:
+      - jwt_secret
+  store:
+    build:
+      context: ./store-srv
+    environment:
+      NODE_ENV: production
+      DB_PORT: ${DB_PORT}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USER: postgres
+      DB_HOST: db-products
+      DB_NAME: ${DB_NAME}
+      GRPC_PRODUCTS_PORT: ${GRPC_PRODUCTS_PORT}
+    ports:
+      - ${GRPC_PRODUCTS_PORT_ACCESS}:${GRPC_PRODUCTS_PORT}
+    depends_on:
+      db-products:
+        condition: service_healthy
+    expose:
+      - ${GRPC_PRODUCTS_PORT}
+    secrets:
+      - jwt_secret
+  search:
+    build:
+      context: ./search-srv
+    environment:
+      NODE_ENV: production
+      DB_PORT: ${DB_PORT}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USER: postgres
+      DB_HOST: db-products
+      DB_NAME: ${DB_NAME}
+      GRPC_SEARCH_PORT: ${GRPC_SEARCH_PORT}
+    ports:
+      - ${GRPC_SEARCH_PORT_ACCESS}:${GRPC_SEARCH_PORT}
+    depends_on:
+      db-products:
+        condition: service_healthy
+    expose:
+      - ${GRPC_SEARCH_PORT}
+    secrets:
+      - jwt_secret
+  db-products:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - db-products-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - ${DB_ACCESS_PORT}:${DB_PORT}
+    expose:
+      - ${DB_PORT}
+    healthcheck:
+      test: [ "CMD", "pg_isready", "--port", "${DB_PORT}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: -p ${DB_PORT}
+  db-auth:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - db-auth-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_AUTH_PASSWORD}
+    ports:
+      - ${DB_AUTH_ACCESS_PORT}:${DB_AUTH_PORT}
+    expose:
+      - ${DB_AUTH_PORT}
+    healthcheck:
+      test: [ "CMD", "pg_isready", "--port", "${DB_AUTH_PORT}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: -p ${DB_AUTH_PORT}
+  cache-server:
+    image: redis
+    restart: always
+    ports:
+      - ${REDIS_PORT_ACCESS}:${REDIS_PORT}
+    volumes:
+      - redis:/root/redis
+      # - /path/to/local/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSOWRD}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DATABASES=16
+volumes:
+  db-products-data:
+  db-auth-data:
+  redis:
+  redis-conf:
+secrets:
+  jwt_secret:
+    file: ./jwt_secret.txt

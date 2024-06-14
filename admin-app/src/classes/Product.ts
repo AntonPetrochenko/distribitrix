@@ -61,4 +61,8 @@ export class Product {
 
         return true
     }
+
+    toData(): ProductDataObject {
+        return {...this}
+    }
 }

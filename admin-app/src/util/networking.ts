@@ -19,7 +19,6 @@ export interface ProductDataObject {
     enabled: boolean
 }
 
-
 // Всякие мелкие процедурки общения с сетью
 // Можно сделать большой класс всяких умностей
 

@@ -1,0 +1,23 @@
+// Этот файл написан первым делом перед тем, как писать в принципе любой код в этом сервисе
+syntax = "proto3";
+
+service User {
+    rpc Auth (Credentials) returns (TokenPair) {};
+    rpc Renew(Token) returns (Token) {};
+    
+    rpc Register (Credentials) returns (TokenPair) {};
+}
+
+message Credentials {
+    string login = 1;
+    string password = 2;
+}
+
+message Token {
+    string value = 1;
+}
+
+message TokenPair {
+    Token renew = 1;
+    Token auth = 2;
+}

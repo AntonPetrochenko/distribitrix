@@ -1,0 +1,25 @@
+{
+  "name": "store",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.9",
+    "@grpc/proto-loader": "^0.7.13",
+    "@types/bcrypt": "^5.0.2",
+    "@types/sequelize": "^4.28.20",
+    "bcrypt": "^5.1.1",
+    "jose": "^5.4.0",
+    "mali": "github:malijs/mali#master",
+    "pg": "^8.12.0",
+    "reflect-metadata": "^0.2.2",
+    "sequelize": "^6.37.3",
+    "sequelize-typescript": "^2.1.6",
+    "typescript": "^5.4.5"
+  }
+}

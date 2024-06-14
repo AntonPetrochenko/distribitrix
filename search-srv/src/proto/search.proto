@@ -1,0 +1,21 @@
+// Этот файл написан первым делом перед тем, как писать в принципе любой код в этом сервисе
+syntax = "proto3";
+
+service Product {
+    rpc Search (SearchRequest) returns (ProductSet) {};
+}
+
+message SearchRequest {
+    string term = 1;
+}
+
+message ProductData {
+    string name = 2;
+    string data = 3;
+    bool enabled = 4;
+    int64 id = 1;
+}
+
+message ProductSet {
+    repeated ProductData products = 1;
+}
