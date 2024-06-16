@@ -2,7 +2,7 @@ import Mali, { Context } from 'mali'
 import { Sequelize } from 'sequelize-typescript'
 import { Op } from 'sequelize'
 import { UserModel } from '../db/models/UserModel'
-import { issueAccess, issueRenewer, verifyRenew } from '../jwt/jwt'
+import { issueAccess, issueRefresher, verifyRefresh } from '../jwt/jwt'
 
 // Класс, представляющий наш сервис
 
@@ -17,26 +17,28 @@ class ProductService {
 
     if (foundUser && foundUser.verifyPassword(creds.password)) {
       return {
-        auth: {value: await issueAccess(creds.login)},
-        renew: {value: await issueRenewer(creds.login)}
+        auth: await issueAccess(creds.login),
+        refresh: await issueRefresher(creds.login)
       }
     }
 
     throw new Error('Unauth?')
   }
 
-  async Renew(claim: Claim): Promise<Token> {
+  async Refresh(claim: Claim): Promise<TokenPair> {
     try {
-      const status = await verifyRenew(claim.token, claim.login)
+      const status = await verifyRefresh(claim.token, claim.login)
       // тут может быть ваша проверка на все дела...
 
       return {
-        value: await issueAccess(claim.login)
+        auth: await issueAccess(claim.login),
+        refresh: await issueRefresher(claim.login)
       }
       
     } catch (e) {
       return {
-        value: 'none, sir' // у меня уже кукуха плывёт на этот момент, пусть будет так
+        auth: '', //todo: понять, как сигналить о неудаче
+        refresh: ''
       }
     }
   };
@@ -52,8 +54,8 @@ class ProductService {
     newUser.save()
 
     return {
-      auth:  {value: await issueAccess(creds.login)},
-      renew: {value: await issueRenewer(creds.login)}
+      auth: await issueAccess(creds.login),
+      refresh: await issueRefresher(creds.login)
     }
 
   };
@@ -66,14 +68,14 @@ class ProductService {
 
 
 export function init(db: Sequelize) {
-  const app = new Mali('./src/proto/auth.proto')
+  const app = new Mali('./src/grpc/proto/auth.proto')
 
   const serviceObject = new ProductService(db);
   
   // Делаем Context<any> для всего, ибо на Mali нет толковых доков под тупоскрипт ну совсем...
   app.use({
     Auth:     (ctx: Context<any>) => { ctx.res = serviceObject.Auth(ctx.req)     },
-    Renew:    (ctx: Context<any>) => { ctx.res = serviceObject.Renew(ctx.req)    },
+    Refresh:    (ctx: Context<any>) => { ctx.res = serviceObject.Refresh(ctx.req)    },
     Register: (ctx: Context<any>) => { ctx.res = serviceObject.Register(ctx.req) }
   })
 

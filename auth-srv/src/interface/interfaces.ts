@@ -10,11 +10,7 @@ interface Claim {
     token: string
 }
 
-interface Token {
-    value: string;
-}
-
 interface TokenPair {
-    renew: Token;
-    auth: Token;
+    refresh: string;
+    auth: string;
 }

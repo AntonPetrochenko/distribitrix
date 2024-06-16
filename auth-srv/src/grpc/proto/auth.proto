@@ -3,9 +3,16 @@ syntax = "proto3";
 
 service User {
     rpc Auth (Credentials) returns (TokenPair) {};
-    rpc Renew(Claim) returns (Token) {};
+    rpc Refresh(Claim) returns (TokenPair) {};
     
-    rpc Register (Credentials) returns (TokenPair) {};
+    rpc Register (UserInfo) returns (TokenPair) {};
+    rpc Modify (UserInfo) returns (Empty) {};
+}
+
+message UserInfo {
+    string login = 1;
+    string password = 2;
+    bool admin = 3;
 }
 
 message Claim {
@@ -17,11 +24,11 @@ message Credentials {
     string password = 2;
 }
 
-message Token {
-    string value = 1;
+message TokenPair {
+    string refresh = 1;
+    string auth = 2;
 }
 
-message TokenPair {
-    Token renew = 1;
-    Token auth = 2;
+message Empty {
+    // не хочу воевать с импортами
 }

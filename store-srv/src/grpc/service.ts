@@ -134,17 +134,19 @@ class ProductService {
 
 
 export function init(db: Sequelize) {
-  const app = new Mali('./src/proto/products.proto')
+  const app = new Mali('./src/grpc/proto/products.proto')
 
   const serviceObject = new ProductService(db);
   
   // Делаем Context<any> для всего, ибо на Mali нет толковых доков под тупоскрипт ну совсем...
+  // UPD: Mali принимает any, any? в setStatus, обработку ошибок держим в уме
+  // TODO: Удалить Mali к чертям из этого проекта и переписать с нормальным grpc сервером из под @grpc/grpc-js
   app.use({
     CreateProducts: async (ctx: Context<any>) => { ctx.res = await serviceObject.CreateProducts(ctx.req) },
-    GetProduct:     async (ctx: Context<any>) => { ctx.res = await serviceObject.GetProduct(ctx.req) },
-    GetListing:     async (ctx: Context<any>) => { ctx.res = await serviceObject.GetListing(ctx.req) },
-    UpdateProduct:  async (ctx: Context<any>) => { ctx.res = await serviceObject.UpdateProduct(ctx.req) },
-    DeleteProduct:  async (ctx: Context<any>) => { ctx.res = await serviceObject.DeleteProduct(ctx.req) }
+    GetProduct:     async (ctx: Context<any>) => { ctx.res = await serviceObject.GetProduct(ctx.req)     },
+    GetListing:     async (ctx: Context<any>) => { ctx.res = await serviceObject.GetListing(ctx.req)     },
+    UpdateProduct:  async (ctx: Context<any>) => { ctx.res = await serviceObject.UpdateProduct(ctx.req)  },
+    DeleteProduct:  async (ctx: Context<any>) => { ctx.res = await serviceObject.DeleteProduct(ctx.req)  }
   })
 
   app.start(`0.0.0.0:${process.env.GRPC_PRODUCTS_PORT}`)

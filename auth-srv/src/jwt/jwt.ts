@@ -11,11 +11,11 @@ function claimTo(what: string, who: string) {
     return `__${what}_${who}`;
 }
 
-export async function issueRenewer(login: string) {
+export async function issueRefresher(login: string) {
     return await (new SignJWT()
         .setProtectedHeader({ alg })
         .setIssuedAt()
-        .setSubject(claimTo('renew', login))
+        .setSubject(claimTo('refresh', login))
         .setIssuer(URN_AUTH)
         .setAudience(URN_AUTH) // от себя себе
         .setExpirationTime('24h')
@@ -33,11 +33,11 @@ export async function issueAccess(login: string) {
         .sign(secret))
 }
 
-export async function verifyRenew(jwt: string, login: string) {
+export async function verifyRefresh(jwt: string, login: string) {
     return await jwtVerify(jwt, secret, {
         audience: URN_AUTH,
         issuer: URN_AUTH,
-        subject: claimTo('renew', login)
+        subject: claimTo('refresh', login)
     })
 }
 

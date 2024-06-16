@@ -30,7 +30,7 @@ class ProductService {
 
 
 export function init(db: Sequelize) {
-  const app = new Mali('./src/proto/search.proto')
+  const app = new Mali('./src/grpc/proto/search.proto')
 
   const serviceObject = new ProductService(db);
   

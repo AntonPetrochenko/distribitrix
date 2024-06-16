@@ -15,17 +15,14 @@ interface DistribitrixDataAccessObject {
 
 // а тут мы трогаемся кукухой и дистилируем "што такое json", 
 // это совсем не нужно на практике, более того индексные типы по какой-то гигамозг причине не проверяются на момент присвоения значений???????
-type StringifySafeValue = string | number | boolean | {toString: () => string} | undefined // undefined, чтобы мне TS кричал про object is possibly undefined во время чтения
-export interface SerializableData { 
-    [x: string]:  StringifySafeValue | (StringifySafeValue | SerializableData)[] | SerializableData // либо какой-то литерал, либо массив таковых, либо такой же объект...
-}
+
 // Можно также воткнуть zod для проверок на рантайме, когда "сформируются требования" о начинке этого JSON, но пока мы просто храним произвольные штуки
 
 export class Product {
     constructor(
         public id: number,
         public name: string,
-        public data: SerializableData, // !!!
+        public data: unknown,
         public enabled: boolean
     ) {}
 

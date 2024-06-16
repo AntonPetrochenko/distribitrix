@@ -1,0 +1,46 @@
+// Этот файл написан первым делом перед тем, как писать в принципе любой код в этом сервисе
+syntax = "proto3";
+
+service Product {
+    rpc CreateProducts (ProductCreationSet) returns (Status) {}; // C+C+C+C+C+C+C+C....
+    rpc GetProduct (ProductRequest) returns (ProductData) {}; // R
+    rpc GetListing (ListingRequest) returns (ProductSet) {}; // R+R+R+R+R+R+R+R....
+    rpc UpdateProduct (ProductData) returns (Status) {}; // U
+    rpc DeleteProduct (ProductRequest) returns (Status) {}; // D
+}
+
+message ProductRequest {
+    int64 id = 1; // Мы Озон, у нас много-много товаров;
+}
+
+message Status { // Минимальное для ранней разработки
+    bool ok = 1;
+    string message = 2;
+}
+
+
+message ListingRequest {
+    int32 pageNumber = 1;
+    int32 perPage = 2;
+}
+
+message ProductData {
+    string name = 2;
+    string data = 3;
+    bool enabled = 4;
+    int64 id = 1;
+}
+
+message ProductCreationData {
+    string name = 2;
+    string data = 3;
+    bool enabled = 4;
+}
+
+message ProductSet {
+    repeated ProductData products = 1;
+}
+
+message ProductCreationSet {
+    repeated ProductCreationData products = 1;
+}

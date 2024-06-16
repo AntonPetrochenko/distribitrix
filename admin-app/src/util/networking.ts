@@ -1,5 +1,5 @@
 import { Axios } from "axios";
-import { Product, SerializableData } from "@/classes/Product";
+import { Product } from "@/classes/Product";
 
 // Сюда для наглядности складываем всё, что нужно для общения с бакендом
 
@@ -15,7 +15,7 @@ interface ProductLoadArgs {
 export interface ProductDataObject {
     id: number
     name: string
-    data: SerializableData
+    data: unknown
     enabled: boolean
 }
 
