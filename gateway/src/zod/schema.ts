@@ -18,5 +18,17 @@ const ProductSchema = z.object({
     enabled: z.boolean()
 })
 
+const ListingRequestSchema = z.object({
+    pageNumber: z.number(),
+    perPage: z.number()
+})
 
-export default { AuthSchema, ProductSchema, UserSchema }
+const RefreshClaimSchema = z.object({
+    login: z.string()
+})
+
+const ProductCreationSchema = ProductSchema.omit({id: true})
+
+const BulkProductCreationSchema = z.array(ProductCreationSchema)
+
+export default { RefreshClaimSchema, AuthSchema, ProductSchema, UserSchema, ProductCreationSchema, BulkProductCreationSchema, ListingRequestSchema }

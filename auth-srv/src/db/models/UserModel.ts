@@ -1,5 +1,5 @@
 import { Table, Column, Model, HasMany, Index, Sequelize, DataType } from 'sequelize-typescript';
-import bcrypt from 'bcrypt'
+import bcrypt, { genSaltSync } from 'bcrypt'
 
 
 @Table
@@ -17,9 +17,11 @@ export class UserModel extends Model {
   passwordHash!: string
 
   setPassword(password: string) {
-    const hash = bcrypt.hashSync(password, 'соль')
+    const hash = bcrypt.hashSync(password, genSaltSync())
 
     this.passwordHash = hash
+
+    this.save()
   }
 
   verifyPassword(password: string) {

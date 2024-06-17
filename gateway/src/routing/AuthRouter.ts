@@ -1,9 +1,10 @@
 import { Response, Router } from "express";
-import { AuthClient } from "../grpc/AuthClient";
+import { AuthClientStub } from "../grpc/AuthClientStub";
 import { z } from "zod";
 import schema from "../zod/schema";
 import { validateAndDenyBadRequest } from "../util/validateAndDenyBadRequest";
 import { handleServiceFailure } from "../util/handleServiceFailure";
+import { COOKIE_TOKEN_AUTH, COOKIE_TOKEN_REFRESH } from "../util/constants";
 export const AuthRouter = Router()
 
 // Тут сразу видно большую ошибку, которую у меня уже нет времени исправить на этом этапе:
@@ -15,17 +16,17 @@ export const AuthRouter = Router()
 // Все эти параметры стоит вынести в отдельный конфиг
 // Этоже можно вкрутить monkey патчем в Response
 function setTokenCookie(res: Response, name: string, token: string) {
-    res.cookie(`token-${name}`, token, {
+    res.cookie(name, token, {
         maxAge: 1000*60*24, // в идеале разный для разных токенов
         httpOnly: true,
         domain: process.env.SESSION_DOMAIN,
-        sameSite: 'strict'
+        secure: false
     })
 }
 
 // для наглядности кладём это рядом. в нормальной ситуации будет ещё один класс,
 // который отвечает за сервис аутентификации и авторизации на уровне гейтвея
-const authClient = new AuthClient() 
+const authClient = new AuthClientStub() 
 
 AuthRouter.post('/user', (req, res) => {
     // Каждый запрос может сначала сломаться с нашей стороны, затем что-то пойти не так в контуре микросервисов
@@ -43,8 +44,8 @@ AuthRouter.post('/user', (req, res) => {
             if (err) {
                 handleServiceFailure(err, res)
             } else {
-                setTokenCookie(res, 'refresh', data?.refresh ?? '')
-                setTokenCookie(res, 'auth', data?.auth ?? '')
+                setTokenCookie(res, COOKIE_TOKEN_REFRESH, data?.refresh ?? '')
+                setTokenCookie(res, COOKIE_TOKEN_AUTH, data?.auth ?? '')
                 res.status(204).send()
             };
         })
@@ -57,7 +58,7 @@ AuthRouter.put('/user', (req, res) => {
     const user = validateAndDenyBadRequest(req, res, schema.UserSchema)
 
     if (user) {
-        authClient.modify(req.cookies['Auth-Token'], user.login, user.password, user.admin, (err) => {
+        authClient.modify(req.cookies[COOKIE_TOKEN_AUTH] ?? '', user.login, user.password, user.admin, (err) => {
             if (err) {
                 handleServiceFailure(err, res)
             } else {
@@ -76,8 +77,25 @@ AuthRouter.post('/login', (req, res) => {
             if (err) {
                 handleServiceFailure(err, res)
             } else if (data) {
-                setTokenCookie(res, 'refresh', data.refresh)
-                setTokenCookie(res, 'auth', data.auth)
+                setTokenCookie(res, COOKIE_TOKEN_AUTH, data.refresh)
+                setTokenCookie(res, COOKIE_TOKEN_REFRESH, data.auth)
+                res.status(204).send()
+            }
+        })
+    }
+})
+
+AuthRouter.post('/refresh', (req, res) => {
+    const refreshClaim = validateAndDenyBadRequest(req, res, schema.RefreshClaimSchema)
+
+    if (refreshClaim) {
+        authClient.refresh(refreshClaim.login, req.cookies[COOKIE_TOKEN_REFRESH] ?? '', (err, data) => {
+            if (err) {
+                handleServiceFailure(err, res, 401) // костыль
+            } else if (data) {
+                setTokenCookie(res, COOKIE_TOKEN_REFRESH, data.refresh)
+                setTokenCookie(res, COOKIE_TOKEN_AUTH, data.auth)
+                res.status(204).send()
             }
         })
     }

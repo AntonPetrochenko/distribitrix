@@ -34,17 +34,25 @@ export async function issueAccess(login: string) {
 }
 
 export async function verifyRefresh(jwt: string, login: string) {
-    return await jwtVerify(jwt, secret, {
-        audience: URN_AUTH,
-        issuer: URN_AUTH,
-        subject: claimTo('refresh', login)
-    })
+    try {
+        return await jwtVerify(jwt, secret, {
+            audience: URN_AUTH,
+            issuer: URN_AUTH,
+            subject: claimTo('refresh', login)
+        })
+    } catch (e) {
+        return false
+    }
 }
 
 export async function verifyAccess(jwt: string, login: string) {
-    return await jwtVerify(jwt, secret, {
-        audience: URN_SERVICE,
-        issuer: URN_AUTH,
-        subject: claimTo('access', login)
-    })
+    try {
+        return await jwtVerify(jwt, secret, {
+            audience: URN_SERVICE,
+            issuer: URN_AUTH,
+            subject: claimTo('access', login)
+        })
+    } catch (e) {
+        return false
+    }
 }

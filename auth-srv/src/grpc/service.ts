@@ -15,6 +15,7 @@ class ProductService {
       }
     })
 
+    
     if (foundUser && foundUser.verifyPassword(creds.password)) {
       return {
         auth: await issueAccess(creds.login),
@@ -22,24 +23,16 @@ class ProductService {
       }
     }
 
-    throw new Error('Unauth?')
+    throw new Error('Invalid credentials')
   }
 
   async Refresh(claim: Claim): Promise<TokenPair> {
-    try {
-      const status = await verifyRefresh(claim.token, claim.login)
-      // тут может быть ваша проверка на все дела...
+    const status = await verifyRefresh(claim.token, claim.login)
+    // тут может быть ваша проверка на все дела...
 
-      return {
-        auth: await issueAccess(claim.login),
-        refresh: await issueRefresher(claim.login)
-      }
-      
-    } catch (e) {
-      return {
-        auth: '', //todo: понять, как сигналить о неудаче
-        refresh: ''
-      }
+    return {
+      auth: await issueAccess(claim.login),
+      refresh: await issueRefresher(claim.login)
     }
   };
 

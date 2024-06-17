@@ -16,7 +16,9 @@ services:
       context: ./gateway
     environment:
       NODE_ENV: production
-      USER_ADDRESS: http://auth:${GRPC_AUTH_PORT}/
+      USER_ADDRESS: auth:${GRPC_AUTH_PORT}
+      STORE_ADDRESS: store:${GRPC_PRODUCTS_PORT}
+      SEARCH_ADDRESS: search:${GRPC_SEARCH_PORT}
     ports:
       - 80:8080
   auth:
