@@ -8,7 +8,8 @@ export const globalAxios = new Axios({
     headers: {
         "Accept": "application/json",
         "Content-type": "application/json"
-    }
+    },
+    withCredentials: true
 })
 
 interface ProductLoadArgs {
@@ -79,11 +80,6 @@ export async function postProducts(products: Product[]) {
     const response = globalAxios.post('/products', JSON.stringify(products))
 }
 
-
-
-
-
-
 /////////////////////////////////////////////////////////////////////////
 
 export async function refreshAuth() {
@@ -92,6 +88,35 @@ export async function refreshAuth() {
     })
 }
 
-export async function register(opts: {}) {
+export async function register(opts: {login: string, password: string}) {
+    // опять же неправильный REST, что со мной такое
+    globalAxios.post('/auth/register', JSON.stringify(opts))
+    .then( (res) => {
+        if (res.status < 400) { // TODO: тут быстрая проверка на все возможные неудачи, уточнить
+            window.location.href = '/' // TODO: всё ещё нет обращения к роутеру
+        }
+    })
+}
 
+export async function authenticate(opts: {login: string, password: string}) {
+    globalAxios.post('/auth/login', JSON.stringify(opts))
+    .then( (res) => {
+        if (res.status < 400) { 
+            window.location.href = '/'
+        }
+    })
+}
+
+/////////////////////////////////
+
+export async function search(searchQuery: string) {
+    const response = await globalAxios.get('/search', {
+        params: {
+            query: searchQuery
+        }
+    })
+
+    const rawProducts = JSON.parse(response.data).products ?? []
+
+    return rawProducts
 }

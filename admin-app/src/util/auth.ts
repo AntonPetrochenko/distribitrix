@@ -1,3 +1,6 @@
+import { globalAxios } from "./networking";
+
 export async function verifyAuth() {
-    return true //TODO
+    const res = await globalAxios.get('/auth/refresh')
+    return res.status > 200 && res.status < 400
 }

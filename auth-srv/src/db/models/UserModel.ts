@@ -1,4 +1,4 @@
-import { Table, Column, Model, HasMany, Index, Sequelize, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, Index, Sequelize, DataType, Unique } from 'sequelize-typescript';
 import bcrypt, { genSaltSync } from 'bcrypt'
 
 
@@ -10,14 +10,16 @@ export class UserModel extends Model {
   })
   id!: number;
   
-  @Column
+  @Column({
+    unique: true
+  })
   name!: string;
 
   @Column
   passwordHash!: string
 
   setPassword(password: string) {
-    const hash = bcrypt.hashSync(password, genSaltSync())
+    const hash = bcrypt.hashSync(password, 10)
 
     this.passwordHash = hash
 

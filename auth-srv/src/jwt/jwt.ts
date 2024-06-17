@@ -39,6 +39,7 @@ export async function verifyRefresh(jwt: string) {
             requiredClaims: ['sub']
         })
     } catch (e) {
+        console.log('Refresh denied', e)
         return false
     }
 }

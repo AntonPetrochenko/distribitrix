@@ -23,12 +23,8 @@ const ListingRequestSchema = z.object({
     perPage: z.number({coerce: true})
 })
 
-const RefreshClaimSchema = z.object({
-    login: z.string()
-})
-
 const ProductCreationSchema = ProductSchema.omit({id: true})
 
 const BulkProductCreationSchema = z.array(ProductCreationSchema)
 
-export default { RefreshClaimSchema, AuthSchema, ProductSchema, UserSchema, ProductCreationSchema, BulkProductCreationSchema, ListingRequestSchema }
+export default { AuthSchema, ProductSchema, UserSchema, ProductCreationSchema, BulkProductCreationSchema, ListingRequestSchema }

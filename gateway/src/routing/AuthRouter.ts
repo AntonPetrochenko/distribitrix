@@ -19,7 +19,7 @@ function setTokenCookie(res: Response, name: string, token: string) {
     res.cookie(name, token, {
         maxAge: 1000*60*24, // в идеале разный для разных токенов
         httpOnly: true,
-        domain: process.env.DOMAIN,
+        // domain: process.env.DOMAIN,
         secure: false
     })
 }
@@ -28,7 +28,7 @@ function setTokenCookie(res: Response, name: string, token: string) {
 // который отвечает за сервис аутентификации и авторизации на уровне гейтвея
 const authClient = new AuthClientStub() 
 
-AuthRouter.post('/user', (req, res) => {
+AuthRouter.post('/register', (req, res) => {
     // Каждый запрос может сначала сломаться с нашей стороны, затем что-то пойти не так в контуре микросервисов
 
     // Валидируем у нас, затем шлём в контур и надеемся на лучшее
@@ -77,26 +77,23 @@ AuthRouter.post('/login', (req, res) => {
             if (err) {
                 handleServiceFailure(err, res)
             } else if (data) {
-                setTokenCookie(res, COOKIE_TOKEN_AUTH, data.refresh)
-                setTokenCookie(res, COOKIE_TOKEN_REFRESH, data.auth)
+                setTokenCookie(res, COOKIE_TOKEN_AUTH, data.auth)
+                setTokenCookie(res, COOKIE_TOKEN_REFRESH, data.refresh)
                 res.status(204).send()
             }
         })
     }
 })
 
-AuthRouter.post('/refresh', (req, res) => {
-    const refreshClaim = validateAndDenyBadRequest(req, res, schema.RefreshClaimSchema)
-    console.log(req.cookies);
-    if (refreshClaim) {
-        authClient.refresh(refreshClaim.login, req.cookies[COOKIE_TOKEN_REFRESH] ?? '', (err, data) => {
-            if (err) {
-                handleServiceFailure(err, res, 401) // костыль
-            } else if (data) {
-                setTokenCookie(res, COOKIE_TOKEN_REFRESH, data.refresh)
-                setTokenCookie(res, COOKIE_TOKEN_AUTH, data.auth)
-                res.status(204).send()
-            }
-        })
-    }
+AuthRouter.get('/refresh', (req, res) => {
+    // Первый аргумент раньше зачем-то был, теперь его нет :)
+    authClient.refresh('REMOVED_ARG', req.cookies[COOKIE_TOKEN_REFRESH] ?? '', (err, data) => {
+        if (err) {
+            handleServiceFailure(err, res, 401) // костыль
+        } else if (data) {
+            setTokenCookie(res, COOKIE_TOKEN_REFRESH, data.refresh)
+            setTokenCookie(res, COOKIE_TOKEN_AUTH, data.auth)
+            res.status(204).send()
+        }
+    })
 })

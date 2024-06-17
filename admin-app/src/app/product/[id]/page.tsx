@@ -19,17 +19,18 @@ export default function ProductPage( {params}: { params: {id: string}}) {
     const [renderedProduct, setRenderedProduct] = useState(nullProduct.toData())
     const [initialProduct, setInitialProduct] = useState(nullProduct.toData())
     
+    const loadProduct = () => {
+        Product.get(parseInt(params.id)).then( (product) => {
+            if (product && typeof product.id == "number"  ) {
+                setRenderedProduct(product.toData())
+                setInitialProduct(product.toData())
+            } else {
+                alert('Не удалось загрузить продукт!')
+            }
+        })
+    }
     if (!isNew) {
-        useEffect(() => {
-            Product.get(parseInt(params.id)).then( (product) => {
-                if (product && typeof product.id == "number"  ) {
-                    setRenderedProduct(product.toData())
-                    setInitialProduct(product.toData())
-                } else {
-                    alert('Не удалось загрузить продукт!')
-                }
-            })
-        }, [])
+        useEffect(loadProduct, [])
     } else {
 
     }
@@ -54,8 +55,8 @@ export default function ProductPage( {params}: { params: {id: string}}) {
                     </>}
                 </h1>
                 {!isNew && <>
-                    <Button>Обновить</Button>
-                    <Button>Сбросить</Button>    
+                    <Button onClick={loadProduct}>Обновить</Button>
+                    <Button onClick={() => {setRenderedProduct({...initialProduct})}}>Сбросить</Button>    
                 </>}
             </Grid>
             <Grid item>

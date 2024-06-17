@@ -17,6 +17,11 @@ class ProductService {
       }
     })
     
+    console.log({
+      foundUser,
+      verified: foundUser?.verifyPassword(creds.password)
+    })
+    
     if (foundUser && foundUser.verifyPassword(creds.password)) {
       return {
         auth: await issueAccess(creds.login),
@@ -38,8 +43,7 @@ class ProductService {
         refresh: await issueRefresher(login)
       }
     } else {
-      //@ts-ignore
-      throw new Error(status)
+      throw new Error("Unauthenticated")
     }
   };
 

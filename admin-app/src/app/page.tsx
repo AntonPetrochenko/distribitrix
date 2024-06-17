@@ -1,10 +1,20 @@
 'use client' // Нет смысла крутить это на севрере (совсем)
 import { DataGrid, GridColDef, GridPaginationModel, useGridApiRef } from "@mui/x-data-grid"
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Product } from "@/classes/Product";
 import axios from "axios";
-import { ProductDataObject, fetchProductListingData } from "@/util/networking";
+import { ProductDataObject, fetchProductListingData, search } from "@/util/networking";
 import { Box, Button, Grid, TextField } from "@mui/material";
+import { verifyAuth } from "@/util/auth";
+
+// с интернетов :)
+const debounce = (fn: Function, ms = 300) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (this: any, ...args: any[]) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), ms);
+  };
+};
 
 const columnDefs: GridColDef[] = [
   {
@@ -17,6 +27,8 @@ const columnDefs: GridColDef[] = [
   }
 ]
 
+const debouncedSearch = debounce(search)
+
 export default function Home() {
   // На корне будет лежать "рабочия область" нашего приложения. Если вдруг мы не имеем права тут сидеть, middleware швырнёт нас на /auth
 
@@ -24,6 +36,8 @@ export default function Home() {
 
   const [perPage, setPageSize] = useState(10)
   const [pageNumber, setPage] = useState(0)
+
+  const [searchQuery, setSearchQuery] = useState('')
   
   // Не будем привязывать наше именование перменных к названия, которое требует одна конкретная библиотека
   const [paginationModel, setPaginationModel] = useState({
@@ -33,7 +47,15 @@ export default function Home() {
   
   const [productsToRender, setProductsToRender] = useState([] as Partial<ProductDataObject>[]);
 
-  useEffect(() => {
+  useEffect( debounce(() => {
+    verifyAuth().then((authenticated) => {
+      if (!authenticated) {
+        window.location.href = '/auth'
+      }
+    })
+  }), [])
+
+  const doNormalLoading = () => {
     fetchProductListingData({
       pageNumber: pageNumber + 1, // Истребитель мне в ангар, MUIX DataGrid считает страницы с нуля, а моя арифметика с 1!!!
       perPage
@@ -45,12 +67,24 @@ export default function Home() {
       pageSize: perPage,
       page: pageNumber,
     })
-  }, [perPage, pageNumber])
+  }
+  useEffect(doNormalLoading, [perPage, pageNumber])
+
+
+  useEffect(() => {
+    if (searchQuery.length > 0) {
+      search(searchQuery).then( (data) => {
+        setProductsToRender(data)
+      })
+    } else {
+      doNormalLoading()
+    }
+  }, [searchQuery])
 
   
   return <div style={{height: '90%'}}>
     <Box sx={{display: 'flex', verticalAlign: 'center', gap: 1, margin: 1}} >
-      <TextField placeholder="Поиск" InputLabelProps={{ shrink: true }}/>
+      <TextField placeholder="Поиск" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} InputLabelProps={{ shrink: true }}/>
       <Button variant="outlined" href="/product/new">Добавить</Button>
     </Box>
     <DataGrid 
