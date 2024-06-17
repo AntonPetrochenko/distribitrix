@@ -6,8 +6,7 @@ interface Credentials {
 }
 
 interface Claim {
-    login: string,
-    token: string
+    login: string
 }
 
 interface TokenPair {

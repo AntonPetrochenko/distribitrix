@@ -32,7 +32,7 @@ function productStatusResponseHandler(err: ServiceError | null, data: Status | u
             handleProductRejection(data, res)
         }
         if ( data ) {
-            res.status(201).send({...data})
+            res.status(201).send(data.toObject())
         }
     }
 }
@@ -59,17 +59,23 @@ ProductsRouter.post('/', (req, res) => {
     }
 })
 
-ProductsRouter.get('/:id', (req, res) => {
-    productClient.getProduct(req.cookies[COOKIE_TOKEN_AUTH] ?? '', parseInt(req.params.id), (err, data) => {
-        if (err) {
-            handleServiceFailure(err, res)
-        } else if (data) {
-            res.status(200).send({...data})
-        }
-    })
+
+console.log('Does anything work in here???')
+ProductsRouter.get('/listing', (req, res) => {
+    const listingRequest = validateAndDenyBadRequest(req, res, schema.ListingRequestSchema, true)
+    console.log(listingRequest)
+    if (listingRequest) {
+        productClient.getListing(req.cookies[COOKIE_TOKEN_AUTH] ?? '', listingRequest.pageNumber, listingRequest.perPage, (err, data) => {
+            if (err) {
+                res.send({message: 'error!', ...listingRequest}) // handleServiceFailure(err, res)
+            } else if (data) {
+                res.status(200).send(data.toObject())
+            }
+        })
+    }
 })
 
-ProductsRouter.put('/', (req, res) => {
+ProductsRouter.put('/', (req, res) => { // это неправильный put. правильный должен был принимать id. но я уже не буду править это со стороны сервиса
     const product = validateAndDenyBadRequest(req, res, schema.ProductSchema)
     if (product) {
         productClient.update(req.cookies[COOKIE_TOKEN_AUTH] ?? '', product, (err, data) => {
@@ -78,15 +84,12 @@ ProductsRouter.put('/', (req, res) => {
     }
 })
 
-ProductsRouter.get('/listing', (req, res) => {
-    const listingRequest = validateAndDenyBadRequest(req, res, schema.ListingRequestSchema)
-    if (listingRequest) {
-        productClient.getListing(req.cookies[COOKIE_TOKEN_AUTH] ?? '', listingRequest.pageNumber, listingRequest.perPage, (err, data) => {
-            if (err) {
-                handleServiceFailure(err, res)
-            } else if (data) {
-                res.status(200).send({...data})
-            }
-        })
-    }
+ProductsRouter.get('/:id', (req, res) => {
+    productClient.getProduct(req.cookies[COOKIE_TOKEN_AUTH] ?? '', parseInt(req.params.id), (err, data) => {
+        if (err) {
+            handleServiceFailure(err, res)
+        } else if (data) {
+            res.status(200).send(data.toObject())
+        }
+    })
 })

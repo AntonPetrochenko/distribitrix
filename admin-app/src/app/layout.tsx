@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import React, { Fragment } from "react";
 import FlaggedStrictMode from "@/util/components/FlaggedStrictMode";
-import { AppBar, Box, ThemeProvider, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Container, ThemeProvider, Toolbar, Typography } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter"
 import theme from '@/theme'
 
@@ -39,11 +39,9 @@ export default function RootLayout({
                 </AppBar>
               </Box>
               <Toolbar />
-              <Box component="main">
-                <Typography component="div">
+              <Container sx={{ height: '90vh' }} component="main">
                   {children}
-                </Typography>
-              </Box>
+              </Container>
             </ThemeProvider>
           </AppRouterCacheProvider>
         </FlaggedStrictMode>

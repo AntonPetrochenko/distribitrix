@@ -2,10 +2,15 @@ import { Request, Response } from "express";
 import { AnyZodObject, ZodError, z } from "zod";
 
 // Это могло быть middleware
-export function validateAndDenyBadRequest<T extends AnyZodObject> (req: Request, res: Response, z: T): z.infer<T> | undefined {
+export function validateAndDenyBadRequest<T extends AnyZodObject> (req: Request, res: Response, z: T, fromQuery?: boolean): z.infer<T> | undefined {
     try {
-        return z.parse(req.body)
+        console.log({
+            query: req.query,
+            body: req.body
+        })
+        return z.parse( fromQuery ? req.query : req.body)
     } catch (e: any) {
+        console.error(e)
         res.statusCode = 400;
         if (e.message) {
             res.send({message: e.messsage})

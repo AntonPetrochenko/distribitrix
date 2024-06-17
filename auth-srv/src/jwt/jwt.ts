@@ -7,15 +7,12 @@ const alg = 'HS256'
 const URN_AUTH = 'urn:distribitrix:auth'
 const URN_SERVICE = 'urn:distribitrix:services'
 
-function claimTo(what: string, who: string) {
-    return `__${what}_${who}`;
-}
 
 export async function issueRefresher(login: string) {
     return await (new SignJWT()
         .setProtectedHeader({ alg })
         .setIssuedAt()
-        .setSubject(claimTo('refresh', login))
+        .setSubject(login)
         .setIssuer(URN_AUTH)
         .setAudience(URN_AUTH) // от себя себе
         .setExpirationTime('24h')
@@ -26,33 +23,34 @@ export async function issueAccess(login: string) {
     return await (new SignJWT()
         .setProtectedHeader({ alg })
         .setIssuedAt()
-        .setSubject(claimTo('access', login))
+        .setSubject(login)
         .setIssuer(URN_AUTH)
         .setAudience(URN_SERVICE)
         .setExpirationTime('2h')
         .sign(secret))
 }
 
-export async function verifyRefresh(jwt: string, login: string) {
+export async function verifyRefresh(jwt: string) {
+    console.log('In method', jwt)
     try {
         return await jwtVerify(jwt, secret, {
             audience: URN_AUTH,
             issuer: URN_AUTH,
-            subject: claimTo('refresh', login)
+            requiredClaims: ['sub']
         })
     } catch (e) {
         return false
     }
 }
 
-export async function verifyAccess(jwt: string, login: string) {
+export async function verifyAccess(jwt: string) {
     try {
         return await jwtVerify(jwt, secret, {
             audience: URN_SERVICE,
             issuer: URN_AUTH,
-            subject: claimTo('access', login)
+            requiredClaims: ['sub']
         })
     } catch (e) {
-        return false
+        return e
     }
 }

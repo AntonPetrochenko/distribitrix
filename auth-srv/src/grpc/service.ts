@@ -3,6 +3,8 @@ import { Sequelize } from 'sequelize-typescript'
 import { Op } from 'sequelize'
 import { UserModel } from '../db/models/UserModel'
 import { issueAccess, issueRefresher, verifyRefresh } from '../jwt/jwt'
+import { Metadata } from '@grpc/grpc-js'
+import { jwtDecrypt } from 'jose'
 
 // Класс, представляющий наш сервис
 
@@ -14,7 +16,6 @@ class ProductService {
         name: creds.login
       }
     })
-
     
     if (foundUser && foundUser.verifyPassword(creds.password)) {
       return {
@@ -26,13 +27,19 @@ class ProductService {
     throw new Error('Invalid credentials')
   }
 
-  async Refresh(claim: Claim): Promise<TokenPair> {
-    const status = await verifyRefresh(claim.token, claim.login)
-    // тут может быть ваша проверка на все дела...
-
-    return {
-      auth: await issueAccess(claim.login),
-      refresh: await issueRefresher(claim.login)
+  async Refresh(claim: Claim, context: Context<any>): Promise<TokenPair> {
+    // я немного устал
+    const token = context.call.metadata.get('refresh-token')[0]?.toString()
+    const status = await verifyRefresh(token)
+    if (status) {
+      const login = status.payload.sub ?? ''
+      return {
+        auth: await issueAccess(login),
+        refresh: await issueRefresher(login)
+      }
+    } else {
+      //@ts-ignore
+      throw new Error(status)
     }
   };
 
@@ -68,7 +75,7 @@ export function init(db: Sequelize) {
   // Делаем Context<any> для всего, ибо на Mali нет толковых доков под тупоскрипт ну совсем...
   app.use({
     Auth:     (ctx: Context<any>) => { ctx.res = serviceObject.Auth(ctx.req)     },
-    Refresh:    (ctx: Context<any>) => { ctx.res = serviceObject.Refresh(ctx.req)    },
+    Refresh:    (ctx: Context<any>) => { ctx.res = serviceObject.Refresh(ctx.req, ctx)},
     Register: (ctx: Context<any>) => { ctx.res = serviceObject.Register(ctx.req) }
   })
 

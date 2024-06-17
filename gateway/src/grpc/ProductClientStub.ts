@@ -31,6 +31,7 @@ export class ProductClientStub {
     }
 
     getListing(authToken: string, pageNumber: number, perPage: number, cb: UnaryCallback<ProductSet>) {
+        console.log('Listing request from', {pageNumber, perPage})
         productClient.GetListing( new ListingRequest({pageNumber, perPage}), tokenToMetadata({auth: authToken}), cb)
     }
 

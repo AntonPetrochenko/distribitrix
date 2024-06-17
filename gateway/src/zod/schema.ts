@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { coerce, z } from "zod";
 
 const AuthSchema = z.object({
     login: z.string(),
@@ -19,8 +19,8 @@ const ProductSchema = z.object({
 })
 
 const ListingRequestSchema = z.object({
-    pageNumber: z.number(),
-    perPage: z.number()
+    pageNumber: z.number({coerce: true}),
+    perPage: z.number({coerce: true})
 })
 
 const RefreshClaimSchema = z.object({

@@ -19,7 +19,7 @@ function setTokenCookie(res: Response, name: string, token: string) {
     res.cookie(name, token, {
         maxAge: 1000*60*24, // в идеале разный для разных токенов
         httpOnly: true,
-        domain: process.env.SESSION_DOMAIN,
+        domain: process.env.DOMAIN,
         secure: false
     })
 }
@@ -87,7 +87,7 @@ AuthRouter.post('/login', (req, res) => {
 
 AuthRouter.post('/refresh', (req, res) => {
     const refreshClaim = validateAndDenyBadRequest(req, res, schema.RefreshClaimSchema)
-
+    console.log(req.cookies);
     if (refreshClaim) {
         authClient.refresh(refreshClaim.login, req.cookies[COOKIE_TOKEN_REFRESH] ?? '', (err, data) => {
             if (err) {

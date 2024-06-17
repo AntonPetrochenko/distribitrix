@@ -1,3 +1,3 @@
-export function verifyAuth() {
+export async function verifyAuth() {
     return true //TODO
 }
