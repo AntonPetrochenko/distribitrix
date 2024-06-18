@@ -23,7 +23,6 @@ WORKDIR /usr/src/app
 ################################################################################
 # Create a stage for installing production dependecies.
 FROM base as deps
-ARG GATEWAY_URL=FAILEDTOGET
 ENV NEXT_PUBLIC_GATEWAY_URL=$GATEWAY_URL
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.npm to speed up subsequent builds.

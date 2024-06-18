@@ -9,6 +9,8 @@ import { Message } from "google-protobuf";
 import { ServiceError } from "@grpc/grpc-js";
 import { COOKIE_TOKEN_AUTH } from "../util/constants";
 import { validateAndDenyBadRequest } from "../util/validateAndDenyBadRequest";
+import { AuthClientStub } from "../grpc/AuthClientStub";
+import { protectWithAuthService } from "../middleware/auth";
 export const ProductsRouter = Router()
 
 // На протяжении всего этого файла я вытаскиваю куки вручную, и в принципе много чего здесь делаю в паскально-процедуральном стиле
@@ -17,6 +19,7 @@ export const ProductsRouter = Router()
 // 100% смог перенять мой код. Такой была моя работа последние 3 года.
 
 const productClient = new ProductClientStub()
+const authClient = new AuthClientStub()
 
 function handleProductRejection(status: Status, res: Response) {
     res.status(400).send({ // TODO: К сожалению, мы не обрабатываем 404 :(
@@ -37,19 +40,19 @@ function productStatusResponseHandler(err: ServiceError | null, data: Status | u
     }
 }
 
-ProductsRouter.post('/', (req, res) => {
+ProductsRouter.post('/', protectWithAuthService, (req, res) => {
     // Тут вадилация чуть умнее. В остальных случаях используем стандартный обработчик
     // Реализуем оба. Как сказано в стабе, когда нибудь может появиться разница, хоть сейчас её и нет
     const singleProduct = schema.ProductCreationSchema.safeParse(req.body)
     if (singleProduct.success) {
-        productClient.create(req.cookies[COOKIE_TOKEN_AUTH] ?? '', singleProduct.data, (err, data) => {
+        productClient.create(singleProduct.data, (err, data) => {
             productStatusResponseHandler(err, data, res)
         })
     }
 
     const bulkProducts = schema.BulkProductCreationSchema.safeParse(req.body)
     if (bulkProducts.success) {
-        productClient.bulkCreate(req.cookies[COOKIE_TOKEN_AUTH] ?? '', bulkProducts.data, (err, data) => {
+        productClient.bulkCreate(bulkProducts.data, (err, data) => {
             productStatusResponseHandler(err, data, res)
         })
     }
@@ -61,35 +64,49 @@ ProductsRouter.post('/', (req, res) => {
 
 
 console.log('Does anything work in here???')
-ProductsRouter.get('/listing', (req, res) => {
+ProductsRouter.get('/listing', protectWithAuthService, (req, res) => {
     const listingRequest = validateAndDenyBadRequest(req, res, schema.ListingRequestSchema, true)
     console.log(listingRequest)
     if (listingRequest) {
-        productClient.getListing(req.cookies[COOKIE_TOKEN_AUTH] ?? '', listingRequest.pageNumber, listingRequest.perPage, (err, data) => {
+
+        authClient.isAdmin(req.cookies[COOKIE_TOKEN_AUTH] ?? '', (err, data) => {
             if (err) {
-                res.send({message: 'error!', ...listingRequest}) // handleServiceFailure(err, res)
+                handleServiceFailure(err, res)
             } else if (data) {
-                res.status(200).send(data.toObject())
+                productClient.getListing(listingRequest.pageNumber, listingRequest.perPage, data.isAdmin, (err, data) => {
+                    if (err) {
+                        handleServiceFailure(err, res)
+                    } else if (data) {
+                        res.status(200).send(data.toObject())
+                    }
+                })
             }
         })
+        
     }
 })
 
-ProductsRouter.put('/', (req, res) => { // это неправильный put. правильный должен был принимать id. но я уже не буду править это со стороны сервиса
+ProductsRouter.put('/', protectWithAuthService, (req, res) => { // это неправильный put. правильный должен был принимать id. но я уже не буду править это со стороны сервиса
     const product = validateAndDenyBadRequest(req, res, schema.ProductSchema)
     if (product) {
-        productClient.update(req.cookies[COOKIE_TOKEN_AUTH] ?? '', product, (err, data) => {
+        productClient.update(product, (err, data) => {
             productStatusResponseHandler(err, data, res)
         })
     }
 })
 
-ProductsRouter.get('/:id', (req, res) => {
-    productClient.getProduct(req.cookies[COOKIE_TOKEN_AUTH] ?? '', parseInt(req.params.id), (err, data) => {
+ProductsRouter.get('/:id', protectWithAuthService, (req, res) => {
+    authClient.isAdmin(req.cookies[COOKIE_TOKEN_AUTH] ?? '', (err, data) => {
         if (err) {
             handleServiceFailure(err, res)
         } else if (data) {
-            res.status(200).send(data.toObject())
+            productClient.getProduct(parseInt(req.params.id), data.isAdmin, (err, data) => {
+                if (err) {
+                    handleServiceFailure(err, res)
+                } else if (data) {
+                    res.status(200).send(data.toObject())
+                }
+            })
         }
     })
 })

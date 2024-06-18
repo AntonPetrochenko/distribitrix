@@ -15,10 +15,11 @@ class ProductService {
     async CreateProducts (data: ProductCreationSet): Promise<Status> {
       try {
 
-        // TypeScript moment? Это работает корректно. Я ломал голову с разными вариантами, что ему нужно дать на ошибку типов,
-        // которая будет, если убрать этот @ts-ignore, ноооооооо так и не нашёл вариант. Двигаемся дальше, к этому вернёмся.
-        /// @ts-ignore
-        const res = await ProductModel.bulkCreate(data.products)
+        const res = await ProductModel.bulkCreate(data.products.map(p => { return {
+          name: p.name,
+          data: p.data,
+          enabled: p.enabled
+        }}))
 
         return {
           message: 'Ok!',
@@ -35,11 +36,18 @@ class ProductService {
     }; // C+C+C+C+C+C+C+C....
 
     async GetProduct (product: ProductRequest): Promise<ProductData | null> {
-      const found = await ProductModel.findOne({
+      // TODO: тут получается очень странная цепочка, где в итоге, по сути, за авторизацию действия отвечает СУБД??
+      // если не админ, поставить флаг allowDisalbed, от которого в запрос добавится where, и СУБД не вернёт искомое
+      const queryOpts = {
         where: {
           id: product.id
         }
-      })
+      }
+      if (!product.allowDisabled) {
+        (queryOpts.where as any).enabled = true
+      }
+
+      const found = await ProductModel.findOne(queryOpts)
 
       if (found) {
         return {
@@ -54,10 +62,18 @@ class ProductService {
     }; // R
 
     async GetListing (req: ListingRequest): Promise<ProductSet> {
-      const res = await ProductModel.findAll({
+      const queryOpts = {
         limit: req.perPage,
         offset: (req.pageNumber-1)*req.perPage
-      })
+      }
+      if (!req.includeDisabled) {
+        (queryOpts as any).where = {
+          enabled: true
+        }
+      }
+      
+      const res = await ProductModel.findAll(queryOpts)
+
 
       return {
         products: res
@@ -73,10 +89,9 @@ class ProductService {
       
       const productPartial: ProductCreationData = {
         data: product.data,
-        enabled: product.enabled,
-        name: product.name
+        name: product.name,
+        enabled: !!product.enabled // тут я бы хотел спросить вас, в чём я ошибся. Boolean, передаваемый по сети, просто исчезает, когда он false
       }
-
       try {
         const [count] = await ProductModel.update(productPartial, {where: {
           id: product.id

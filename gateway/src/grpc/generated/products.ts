@@ -9,12 +9,16 @@ export class ProductRequest extends pb_1.Message {
     #one_of_decls: number[][] = [];
     constructor(data?: any[] | {
         id?: number;
+        allowDisabled?: boolean;
     }) {
         super();
         pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
         if (!Array.isArray(data) && typeof data == "object") {
             if ("id" in data && data.id != undefined) {
                 this.id = data.id;
+            }
+            if ("allowDisabled" in data && data.allowDisabled != undefined) {
+                this.allowDisabled = data.allowDisabled;
             }
         }
     }
@@ -24,21 +28,35 @@ export class ProductRequest extends pb_1.Message {
     set id(value: number) {
         pb_1.Message.setField(this, 1, value);
     }
+    get allowDisabled() {
+        return pb_1.Message.getFieldWithDefault(this, 2, false) as boolean;
+    }
+    set allowDisabled(value: boolean) {
+        pb_1.Message.setField(this, 2, value);
+    }
     static fromObject(data: {
         id?: number;
+        allowDisabled?: boolean;
     }): ProductRequest {
         const message = new ProductRequest({});
         if (data.id != null) {
             message.id = data.id;
+        }
+        if (data.allowDisabled != null) {
+            message.allowDisabled = data.allowDisabled;
         }
         return message;
     }
     toObject() {
         const data: {
             id?: number;
+            allowDisabled?: boolean;
         } = {};
         if (this.id != null) {
             data.id = this.id;
+        }
+        if (this.allowDisabled != null) {
+            data.allowDisabled = this.allowDisabled;
         }
         return data;
     }
@@ -48,6 +66,8 @@ export class ProductRequest extends pb_1.Message {
         const writer = w || new pb_1.BinaryWriter();
         if (this.id != 0)
             writer.writeInt64(1, this.id);
+        if (this.allowDisabled != false)
+            writer.writeBool(2, this.allowDisabled);
         if (!w)
             return writer.getResultBuffer();
     }
@@ -59,6 +79,9 @@ export class ProductRequest extends pb_1.Message {
             switch (reader.getFieldNumber()) {
                 case 1:
                     message.id = reader.readInt64();
+                    break;
+                case 2:
+                    message.allowDisabled = reader.readBool();
                     break;
                 default: reader.skipField();
             }
@@ -167,6 +190,7 @@ export class ListingRequest extends pb_1.Message {
     constructor(data?: any[] | {
         pageNumber?: number;
         perPage?: number;
+        includeDisabled?: boolean;
     }) {
         super();
         pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
@@ -176,6 +200,9 @@ export class ListingRequest extends pb_1.Message {
             }
             if ("perPage" in data && data.perPage != undefined) {
                 this.perPage = data.perPage;
+            }
+            if ("includeDisabled" in data && data.includeDisabled != undefined) {
+                this.includeDisabled = data.includeDisabled;
             }
         }
     }
@@ -191,9 +218,16 @@ export class ListingRequest extends pb_1.Message {
     set perPage(value: number) {
         pb_1.Message.setField(this, 2, value);
     }
+    get includeDisabled() {
+        return pb_1.Message.getFieldWithDefault(this, 3, false) as boolean;
+    }
+    set includeDisabled(value: boolean) {
+        pb_1.Message.setField(this, 3, value);
+    }
     static fromObject(data: {
         pageNumber?: number;
         perPage?: number;
+        includeDisabled?: boolean;
     }): ListingRequest {
         const message = new ListingRequest({});
         if (data.pageNumber != null) {
@@ -202,18 +236,25 @@ export class ListingRequest extends pb_1.Message {
         if (data.perPage != null) {
             message.perPage = data.perPage;
         }
+        if (data.includeDisabled != null) {
+            message.includeDisabled = data.includeDisabled;
+        }
         return message;
     }
     toObject() {
         const data: {
             pageNumber?: number;
             perPage?: number;
+            includeDisabled?: boolean;
         } = {};
         if (this.pageNumber != null) {
             data.pageNumber = this.pageNumber;
         }
         if (this.perPage != null) {
             data.perPage = this.perPage;
+        }
+        if (this.includeDisabled != null) {
+            data.includeDisabled = this.includeDisabled;
         }
         return data;
     }
@@ -225,6 +266,8 @@ export class ListingRequest extends pb_1.Message {
             writer.writeInt32(1, this.pageNumber);
         if (this.perPage != 0)
             writer.writeInt32(2, this.perPage);
+        if (this.includeDisabled != false)
+            writer.writeBool(3, this.includeDisabled);
         if (!w)
             return writer.getResultBuffer();
     }
@@ -239,6 +282,9 @@ export class ListingRequest extends pb_1.Message {
                     break;
                 case 2:
                     message.perPage = reader.readInt32();
+                    break;
+                case 3:
+                    message.includeDisabled = reader.readBool();
                     break;
                 default: reader.skipField();
             }

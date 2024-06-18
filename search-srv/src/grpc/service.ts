@@ -9,13 +9,21 @@ import { ProductModel } from '../db/models/ProductModel'
 class ProductService {
 
   async Search (req: SearchRequest): Promise<ProductSet> {
-    const res = await ProductModel.findAll({
+    const queryOpts = {
       where: {
         name: {
           [Op.like]: `%${req.term}%`
         }
       }
-    })
+    }
+
+    // Чаще всего я работаю с чейнящимися билдерами,
+    // поэтому такая ситуёвина сбивает меня с толку
+    
+    if (!req.includeDisabled) {
+      (queryOpts.where as any).enabled = true
+    }
+    const res = await ProductModel.findAll(queryOpts)
 
     return {
       products: res

@@ -7,11 +7,13 @@ interface Status { // Минимальное для ранней разрабо�
 
 interface ProductRequest {
     id: number;
+    allowDisabled: boolean;
 }
 
 interface ListingRequest {
     pageNumber: number;
     perPage: number;
+    includeDisabled: boolean;
 }
 
 interface ProductData {

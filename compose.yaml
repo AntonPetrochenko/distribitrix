@@ -25,7 +25,7 @@ services:
       DOMAIN: ${DOMAIN}
       EXPRESS_ACCESS_CONTROL_ALLOW_ORIGIN: ${EXPRESS_ACCESS_CONTROL_ALLOW_ORIGIN}
     ports:
-      - 80:8080
+      - 8080:8080
   auth:
     build:
       context: ./auth-srv

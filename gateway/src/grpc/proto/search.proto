@@ -1,12 +1,13 @@
 // Этот файл написан первым делом перед тем, как писать в принципе любой код в этом сервисе
 syntax = "proto3";
 
-service Product {
+service Search {
     rpc Search (SearchRequest) returns (ProductSet) {};
 }
 
 message SearchRequest {
     string term = 1;
+    bool includeDisabled = 2;
 }
 
 message ProductData {

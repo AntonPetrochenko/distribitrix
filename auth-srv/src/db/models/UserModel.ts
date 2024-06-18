@@ -18,12 +18,23 @@ export class UserModel extends Model {
   @Column
   passwordHash!: string
 
+  @Column
+  isAdmin!: boolean
+
   setPassword(password: string) {
     const hash = bcrypt.hashSync(password, 10)
 
     this.passwordHash = hash
 
     this.save()
+  }
+
+  static async byLogin(login: string) {
+    return this.findOne({
+      where: {
+        name
+      }
+    })
   }
 
   verifyPassword(password: string) {

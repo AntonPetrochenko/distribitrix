@@ -2,6 +2,7 @@
 
 interface SearchRequest {
     term: string;
+    includeDisabled: boolean
 }
 
 interface ProductData {

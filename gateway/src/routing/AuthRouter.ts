@@ -87,7 +87,7 @@ AuthRouter.post('/login', (req, res) => {
 
 AuthRouter.get('/refresh', (req, res) => {
     // Первый аргумент раньше зачем-то был, теперь его нет :)
-    authClient.refresh('REMOVED_ARG', req.cookies[COOKIE_TOKEN_REFRESH] ?? '', (err, data) => {
+    authClient.refresh(req.cookies[COOKIE_TOKEN_REFRESH] ?? '', (err, data) => {
         if (err) {
             handleServiceFailure(err, res, 401) // костыль
         } else if (data) {

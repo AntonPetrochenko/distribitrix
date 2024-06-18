@@ -1,10 +1,7 @@
 import Mali, { Context } from 'mali'
 import { Sequelize } from 'sequelize-typescript'
-import { Op } from 'sequelize'
 import { UserModel } from '../db/models/UserModel'
-import { issueAccess, issueRefresher, verifyRefresh } from '../jwt/jwt'
-import { Metadata } from '@grpc/grpc-js'
-import { jwtDecrypt } from 'jose'
+import { authorize, issueAuthentication, issueRefresher, verifyAuth, verifyRefresh } from '../jwt/jwt'
 
 // Класс, представляющий наш сервис
 
@@ -24,7 +21,7 @@ class ProductService {
     
     if (foundUser && foundUser.verifyPassword(creds.password)) {
       return {
-        auth: await issueAccess(creds.login),
+        auth: await issueAuthentication(creds.login),
         refresh: await issueRefresher(creds.login)
       }
     }
@@ -32,14 +29,14 @@ class ProductService {
     throw new Error('Invalid credentials')
   }
 
-  async Refresh(claim: Claim, context: Context<any>): Promise<TokenPair> {
+  async Refresh(context: Context<any>): Promise<TokenPair> {
     // я немного устал
     const token = context.call.metadata.get('refresh-token')[0]?.toString()
     const status = await verifyRefresh(token)
     if (status) {
       const login = status.payload.sub ?? ''
       return {
-        auth: await issueAccess(login),
+        auth: await issueAuthentication(login),
         refresh: await issueRefresher(login)
       }
     } else {
@@ -58,11 +55,23 @@ class ProductService {
     newUser.save()
 
     return {
-      auth: await issueAccess(creds.login),
+      auth: await issueAuthentication(creds.login),
       refresh: await issueRefresher(creds.login)
     }
 
   };
+
+  async isAdmin (context: Context<any>): Promise<PermissionResponse> {
+    return {
+      isAdmin: await authorize(context.call.metadata.get('auth-token')[0]?.toString())
+    } 
+  } 
+
+  async isAuthenticated (context: Context<any>): Promise<AuthenticationResponse> {
+    return {
+      isAuthenticated: !!( await verifyAuth( context.call.metadata.get('auth-token')[0]?.toString() ) )
+    }
+  }
 
   constructor(
     private db: Sequelize
@@ -79,8 +88,10 @@ export function init(db: Sequelize) {
   // Делаем Context<any> для всего, ибо на Mali нет толковых доков под тупоскрипт ну совсем...
   app.use({
     Auth:     (ctx: Context<any>) => { ctx.res = serviceObject.Auth(ctx.req)     },
-    Refresh:    (ctx: Context<any>) => { ctx.res = serviceObject.Refresh(ctx.req, ctx)},
-    Register: (ctx: Context<any>) => { ctx.res = serviceObject.Register(ctx.req) }
+    Refresh:    (ctx: Context<any>) => { ctx.res = serviceObject.Refresh(ctx)},
+    Register: (ctx: Context<any>) => { ctx.res = serviceObject.Register(ctx.req) },
+    isAdmin: (ctx: Context<any>) => { ctx.res = serviceObject.isAdmin(ctx) },
+    isAuthenticated: (ctx: Context<any>) => { ctx.res = serviceObject.isAuthenticated(ctx) }
   })
 
   app.start(`0.0.0.0:${process.env.GRPC_AUTH_PORT}`)

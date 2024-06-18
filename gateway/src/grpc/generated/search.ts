@@ -9,12 +9,16 @@ export class SearchRequest extends pb_1.Message {
     #one_of_decls: number[][] = [];
     constructor(data?: any[] | {
         term?: string;
+        includeDisabled?: boolean;
     }) {
         super();
         pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
         if (!Array.isArray(data) && typeof data == "object") {
             if ("term" in data && data.term != undefined) {
                 this.term = data.term;
+            }
+            if ("includeDisabled" in data && data.includeDisabled != undefined) {
+                this.includeDisabled = data.includeDisabled;
             }
         }
     }
@@ -24,21 +28,35 @@ export class SearchRequest extends pb_1.Message {
     set term(value: string) {
         pb_1.Message.setField(this, 1, value);
     }
+    get includeDisabled() {
+        return pb_1.Message.getFieldWithDefault(this, 2, false) as boolean;
+    }
+    set includeDisabled(value: boolean) {
+        pb_1.Message.setField(this, 2, value);
+    }
     static fromObject(data: {
         term?: string;
+        includeDisabled?: boolean;
     }): SearchRequest {
         const message = new SearchRequest({});
         if (data.term != null) {
             message.term = data.term;
+        }
+        if (data.includeDisabled != null) {
+            message.includeDisabled = data.includeDisabled;
         }
         return message;
     }
     toObject() {
         const data: {
             term?: string;
+            includeDisabled?: boolean;
         } = {};
         if (this.term != null) {
             data.term = this.term;
+        }
+        if (this.includeDisabled != null) {
+            data.includeDisabled = this.includeDisabled;
         }
         return data;
     }
@@ -48,6 +66,8 @@ export class SearchRequest extends pb_1.Message {
         const writer = w || new pb_1.BinaryWriter();
         if (this.term.length)
             writer.writeString(1, this.term);
+        if (this.includeDisabled != false)
+            writer.writeBool(2, this.includeDisabled);
         if (!w)
             return writer.getResultBuffer();
     }
@@ -59,6 +79,9 @@ export class SearchRequest extends pb_1.Message {
             switch (reader.getFieldNumber()) {
                 case 1:
                     message.term = reader.readString();
+                    break;
+                case 2:
+                    message.includeDisabled = reader.readBool();
                     break;
                 default: reader.skipField();
             }
@@ -299,10 +322,10 @@ interface GrpcPromiseServiceInterface<P, R> {
     (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): Promise<R>;
     (message: P, options?: grpc_1.CallOptions): Promise<R>;
 }
-export abstract class UnimplementedProductService {
+export abstract class UnimplementedSearchService {
     static definition = {
         Search: {
-            path: "/Product/Search",
+            path: "/Search/Search",
             requestStream: false,
             responseStream: false,
             requestSerialize: (message: SearchRequest) => Buffer.from(message.serialize()),
@@ -314,7 +337,7 @@ export abstract class UnimplementedProductService {
     [method: string]: grpc_1.UntypedHandleCall;
     abstract Search(call: grpc_1.ServerUnaryCall<SearchRequest, ProductSet>, callback: grpc_1.sendUnaryData<ProductSet>): void;
 }
-export class ProductClient extends grpc_1.makeGenericClientConstructor(UnimplementedProductService.definition, "Product", {}) {
+export class SearchClient extends grpc_1.makeGenericClientConstructor(UnimplementedSearchService.definition, "Search", {}) {
     constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
         super(address, credentials, options);
     }

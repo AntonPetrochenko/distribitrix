@@ -1,5 +1,5 @@
 import { ChannelCredentials, Metadata } from "@grpc/grpc-js";
-import { Claim, Credentials, TokenPair, UserClient, UserInfo } from "./generated/auth";
+import { AuthenticationResponse, Credentials, Empty, PermissionResponse, TokenPair, UserClient, UserInfo } from "./generated/auth";
 import { UnaryCallback } from "@grpc/grpc-js/build/src/client";
 import { tokenToMetadata } from "../util/tokenToMetadata";
 
@@ -16,8 +16,8 @@ export class AuthClientStub {
         userClient.Register(new Credentials({login, password}), new Metadata({}), cb)
     }
 
-    refresh(login: string, refreshToken: string, cb: UnaryCallback<TokenPair>) {
-        userClient.Refresh(new Claim({login}), tokenToMetadata({refresh: refreshToken}), cb)
+    refresh(refreshToken: string, cb: UnaryCallback<TokenPair>) {
+        userClient.Refresh(new Empty(),tokenToMetadata({refresh: refreshToken}), cb)
     }
 
     modify(authToken: string, login: string, password: string, admin: boolean, cb: UnaryCallback<{}>) {
@@ -26,5 +26,13 @@ export class AuthClientStub {
             password,
             admin
         }),tokenToMetadata({auth: authToken}), cb)
+    }
+
+    isAdmin(authToken: string, cb: UnaryCallback<PermissionResponse>) {
+        userClient.isAdmin(new Empty(), tokenToMetadata({auth: authToken}), cb)
+    }
+
+    isAuthenticated(authToken: string, cb: UnaryCallback<AuthenticationResponse>) {
+        userClient.isAuthenticated(new Empty(), tokenToMetadata({auth: authToken}), cb)
     }
 }

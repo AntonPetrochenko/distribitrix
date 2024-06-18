@@ -5,6 +5,140 @@
  * git: https://github.com/thesayyn/protoc-gen-ts */
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
+export class AuthenticationResponse extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        isAuthenticated?: boolean;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("isAuthenticated" in data && data.isAuthenticated != undefined) {
+                this.isAuthenticated = data.isAuthenticated;
+            }
+        }
+    }
+    get isAuthenticated() {
+        return pb_1.Message.getFieldWithDefault(this, 1, false) as boolean;
+    }
+    set isAuthenticated(value: boolean) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    static fromObject(data: {
+        isAuthenticated?: boolean;
+    }): AuthenticationResponse {
+        const message = new AuthenticationResponse({});
+        if (data.isAuthenticated != null) {
+            message.isAuthenticated = data.isAuthenticated;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            isAuthenticated?: boolean;
+        } = {};
+        if (this.isAuthenticated != null) {
+            data.isAuthenticated = this.isAuthenticated;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.isAuthenticated != false)
+            writer.writeBool(1, this.isAuthenticated);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AuthenticationResponse {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AuthenticationResponse();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.isAuthenticated = reader.readBool();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): AuthenticationResponse {
+        return AuthenticationResponse.deserialize(bytes);
+    }
+}
+export class PermissionResponse extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        isAdmin?: boolean;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("isAdmin" in data && data.isAdmin != undefined) {
+                this.isAdmin = data.isAdmin;
+            }
+        }
+    }
+    get isAdmin() {
+        return pb_1.Message.getFieldWithDefault(this, 1, false) as boolean;
+    }
+    set isAdmin(value: boolean) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    static fromObject(data: {
+        isAdmin?: boolean;
+    }): PermissionResponse {
+        const message = new PermissionResponse({});
+        if (data.isAdmin != null) {
+            message.isAdmin = data.isAdmin;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            isAdmin?: boolean;
+        } = {};
+        if (this.isAdmin != null) {
+            data.isAdmin = this.isAdmin;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.isAdmin != false)
+            writer.writeBool(1, this.isAdmin);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): PermissionResponse {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new PermissionResponse();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.isAdmin = reader.readBool();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): PermissionResponse {
+        return PermissionResponse.deserialize(bytes);
+    }
+}
 export class UserInfo extends pb_1.Message {
     #one_of_decls: number[][] = [];
     constructor(data?: any[] | {
@@ -116,73 +250,6 @@ export class UserInfo extends pb_1.Message {
     }
     static deserializeBinary(bytes: Uint8Array): UserInfo {
         return UserInfo.deserialize(bytes);
-    }
-}
-export class Claim extends pb_1.Message {
-    #one_of_decls: number[][] = [];
-    constructor(data?: any[] | {
-        login?: string;
-    }) {
-        super();
-        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
-        if (!Array.isArray(data) && typeof data == "object") {
-            if ("login" in data && data.login != undefined) {
-                this.login = data.login;
-            }
-        }
-    }
-    get login() {
-        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
-    }
-    set login(value: string) {
-        pb_1.Message.setField(this, 1, value);
-    }
-    static fromObject(data: {
-        login?: string;
-    }): Claim {
-        const message = new Claim({});
-        if (data.login != null) {
-            message.login = data.login;
-        }
-        return message;
-    }
-    toObject() {
-        const data: {
-            login?: string;
-        } = {};
-        if (this.login != null) {
-            data.login = this.login;
-        }
-        return data;
-    }
-    serialize(): Uint8Array;
-    serialize(w: pb_1.BinaryWriter): void;
-    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-        const writer = w || new pb_1.BinaryWriter();
-        if (this.login.length)
-            writer.writeString(1, this.login);
-        if (!w)
-            return writer.getResultBuffer();
-    }
-    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Claim {
-        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Claim();
-        while (reader.nextField()) {
-            if (reader.isEndGroup())
-                break;
-            switch (reader.getFieldNumber()) {
-                case 1:
-                    message.login = reader.readString();
-                    break;
-                default: reader.skipField();
-            }
-        }
-        return message;
-    }
-    serializeBinary(): Uint8Array {
-        return this.serialize();
-    }
-    static deserializeBinary(bytes: Uint8Array): Claim {
-        return Claim.deserialize(bytes);
     }
 }
 export class Credentials extends pb_1.Message {
@@ -444,8 +511,8 @@ export abstract class UnimplementedUserService {
             path: "/User/Refresh",
             requestStream: false,
             responseStream: false,
-            requestSerialize: (message: Claim) => Buffer.from(message.serialize()),
-            requestDeserialize: (bytes: Buffer) => Claim.deserialize(new Uint8Array(bytes)),
+            requestSerialize: (message: Empty) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => Empty.deserialize(new Uint8Array(bytes)),
             responseSerialize: (message: TokenPair) => Buffer.from(message.serialize()),
             responseDeserialize: (bytes: Buffer) => TokenPair.deserialize(new Uint8Array(bytes))
         },
@@ -466,13 +533,33 @@ export abstract class UnimplementedUserService {
             requestDeserialize: (bytes: Buffer) => UserInfo.deserialize(new Uint8Array(bytes)),
             responseSerialize: (message: Empty) => Buffer.from(message.serialize()),
             responseDeserialize: (bytes: Buffer) => Empty.deserialize(new Uint8Array(bytes))
+        },
+        isAdmin: {
+            path: "/User/isAdmin",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: Empty) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => Empty.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: PermissionResponse) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => PermissionResponse.deserialize(new Uint8Array(bytes))
+        },
+        isAuthenticated: {
+            path: "/User/isAuthenticated",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: Empty) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => Empty.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: AuthenticationResponse) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => AuthenticationResponse.deserialize(new Uint8Array(bytes))
         }
     };
     [method: string]: grpc_1.UntypedHandleCall;
     abstract Auth(call: grpc_1.ServerUnaryCall<Credentials, TokenPair>, callback: grpc_1.sendUnaryData<TokenPair>): void;
-    abstract Refresh(call: grpc_1.ServerUnaryCall<Claim, TokenPair>, callback: grpc_1.sendUnaryData<TokenPair>): void;
+    abstract Refresh(call: grpc_1.ServerUnaryCall<Empty, TokenPair>, callback: grpc_1.sendUnaryData<TokenPair>): void;
     abstract Register(call: grpc_1.ServerUnaryCall<Credentials, TokenPair>, callback: grpc_1.sendUnaryData<TokenPair>): void;
     abstract Modify(call: grpc_1.ServerUnaryCall<UserInfo, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
+    abstract isAdmin(call: grpc_1.ServerUnaryCall<Empty, PermissionResponse>, callback: grpc_1.sendUnaryData<PermissionResponse>): void;
+    abstract isAuthenticated(call: grpc_1.ServerUnaryCall<Empty, AuthenticationResponse>, callback: grpc_1.sendUnaryData<AuthenticationResponse>): void;
 }
 export class UserClient extends grpc_1.makeGenericClientConstructor(UnimplementedUserService.definition, "User", {}) {
     constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
@@ -481,7 +568,7 @@ export class UserClient extends grpc_1.makeGenericClientConstructor(Unimplemente
     Auth: GrpcUnaryServiceInterface<Credentials, TokenPair> = (message: Credentials, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<TokenPair>, options?: grpc_1.CallOptions | grpc_1.requestCallback<TokenPair>, callback?: grpc_1.requestCallback<TokenPair>): grpc_1.ClientUnaryCall => {
         return super.Auth(message, metadata, options, callback);
     };
-    Refresh: GrpcUnaryServiceInterface<Claim, TokenPair> = (message: Claim, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<TokenPair>, options?: grpc_1.CallOptions | grpc_1.requestCallback<TokenPair>, callback?: grpc_1.requestCallback<TokenPair>): grpc_1.ClientUnaryCall => {
+    Refresh: GrpcUnaryServiceInterface<Empty, TokenPair> = (message: Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<TokenPair>, options?: grpc_1.CallOptions | grpc_1.requestCallback<TokenPair>, callback?: grpc_1.requestCallback<TokenPair>): grpc_1.ClientUnaryCall => {
         return super.Refresh(message, metadata, options, callback);
     };
     Register: GrpcUnaryServiceInterface<Credentials, TokenPair> = (message: Credentials, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<TokenPair>, options?: grpc_1.CallOptions | grpc_1.requestCallback<TokenPair>, callback?: grpc_1.requestCallback<TokenPair>): grpc_1.ClientUnaryCall => {
@@ -489,5 +576,11 @@ export class UserClient extends grpc_1.makeGenericClientConstructor(Unimplemente
     };
     Modify: GrpcUnaryServiceInterface<UserInfo, Empty> = (message: UserInfo, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<Empty>, options?: grpc_1.CallOptions | grpc_1.requestCallback<Empty>, callback?: grpc_1.requestCallback<Empty>): grpc_1.ClientUnaryCall => {
         return super.Modify(message, metadata, options, callback);
+    };
+    isAdmin: GrpcUnaryServiceInterface<Empty, PermissionResponse> = (message: Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<PermissionResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<PermissionResponse>, callback?: grpc_1.requestCallback<PermissionResponse>): grpc_1.ClientUnaryCall => {
+        return super.isAdmin(message, metadata, options, callback);
+    };
+    isAuthenticated: GrpcUnaryServiceInterface<Empty, AuthenticationResponse> = (message: Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<AuthenticationResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<AuthenticationResponse>, callback?: grpc_1.requestCallback<AuthenticationResponse>): grpc_1.ClientUnaryCall => {
+        return super.isAuthenticated(message, metadata, options, callback);
     };
 }

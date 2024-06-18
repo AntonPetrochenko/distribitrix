@@ -13,3 +13,11 @@ interface TokenPair {
     refresh: string;
     auth: string;
 }
+
+interface PermissionResponse {
+    isAdmin: boolean;
+}
+
+interface AuthenticationResponse {
+    isAuthenticated: boolean;
+}
