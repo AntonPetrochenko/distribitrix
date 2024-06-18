@@ -1,10 +1,11 @@
 import { Axios } from "axios";
 import { Product } from "@/classes/Product";
+import getConfig from "next/config";
 
 // Сюда для наглядности складываем всё, что нужно для общения с бакендом
 
 export const globalAxios = new Axios({
-    baseURL: process.env.NEXT_PUBLIC_GATEWAY_URL, // в принципе ничего другого пока сюда не пихаем...
+    baseURL: process.env.NEXT_PUBLIC_GATEWAY_URL, // oh no, cringe
     headers: {
         "Accept": "application/json",
         "Content-type": "application/json"

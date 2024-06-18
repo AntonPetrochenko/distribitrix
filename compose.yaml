@@ -2,6 +2,8 @@ services:
   frontend:
     build:
       context: ./admin-app
+      args:
+        - GATEWAY_URL=${GATEWAY_URL}
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_GATEWAY_URL: ${GATEWAY_URL}
