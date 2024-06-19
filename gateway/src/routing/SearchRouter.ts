@@ -1,16 +1,16 @@
 import { Router } from "express"
-import { SearchClientStub } from "../grpc/SearchClientStub"
+import { SearchClientImpl } from "../grpc/SearchClientImpl"
 import { handleServiceFailure } from "../util/handleServiceFailure"
-import { AuthClientStub } from "../grpc/AuthClientStub"
+import { AuthClientImpl } from "../grpc/AuthClientImpl"
 import { protectWithAuthService } from "../middleware/auth"
 import { COOKIE_TOKEN_AUTH } from "../util/constants"
 
 export const SearchRouter = Router()
 
-const searchClient = new SearchClientStub()
+const searchClient = new SearchClientImpl()
 
 // TODO: Пока заведём тут ещё один экземпляр authClient, потом переделаем их загрузку
-const authClient = new AuthClientStub() 
+const authClient = new AuthClientImpl() 
 
 SearchRouter.get('/', protectWithAuthService, (req, res) => {
     authClient.isAdmin(req.cookies[COOKIE_TOKEN_AUTH] ?? '', (err, data) => {

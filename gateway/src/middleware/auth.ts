@@ -1,10 +1,10 @@
-import { AuthClientStub } from "../grpc/AuthClientStub";
+import { AuthClientImpl } from "../grpc/AuthClientImpl";
 
 import { Request, Response, NextFunction } from "express";
 import { handleServiceFailure } from "../util/handleServiceFailure";
 import { COOKIE_TOKEN_AUTH } from "../util/constants";
 
-const authClient = new AuthClientStub()
+const authClient = new AuthClientImpl()
 
 export function protectWithAuthService(req: Request, res: Response, next: NextFunction) {
 

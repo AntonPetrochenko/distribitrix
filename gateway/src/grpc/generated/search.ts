@@ -324,8 +324,8 @@ interface GrpcPromiseServiceInterface<P, R> {
 }
 export abstract class UnimplementedSearchService {
     static definition = {
-        Search: {
-            path: "/Search/Search",
+        Get: {
+            path: "/Search/Get",
             requestStream: false,
             responseStream: false,
             requestSerialize: (message: SearchRequest) => Buffer.from(message.serialize()),
@@ -335,13 +335,13 @@ export abstract class UnimplementedSearchService {
         }
     };
     [method: string]: grpc_1.UntypedHandleCall;
-    abstract Search(call: grpc_1.ServerUnaryCall<SearchRequest, ProductSet>, callback: grpc_1.sendUnaryData<ProductSet>): void;
+    abstract Get(call: grpc_1.ServerUnaryCall<SearchRequest, ProductSet>, callback: grpc_1.sendUnaryData<ProductSet>): void;
 }
 export class SearchClient extends grpc_1.makeGenericClientConstructor(UnimplementedSearchService.definition, "Search", {}) {
     constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
         super(address, credentials, options);
     }
-    Search: GrpcUnaryServiceInterface<SearchRequest, ProductSet> = (message: SearchRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<ProductSet>, options?: grpc_1.CallOptions | grpc_1.requestCallback<ProductSet>, callback?: grpc_1.requestCallback<ProductSet>): grpc_1.ClientUnaryCall => {
-        return super.Search(message, metadata, options, callback);
+    Get: GrpcUnaryServiceInterface<SearchRequest, ProductSet> = (message: SearchRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<ProductSet>, options?: grpc_1.CallOptions | grpc_1.requestCallback<ProductSet>, callback?: grpc_1.requestCallback<ProductSet>): grpc_1.ClientUnaryCall => {
+        return super.Get(message, metadata, options, callback);
     };
 }

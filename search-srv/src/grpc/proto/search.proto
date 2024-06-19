@@ -2,7 +2,7 @@
 syntax = "proto3";
 
 service Search {
-    rpc Search (SearchRequest) returns (ProductSet) {};
+    rpc Get (SearchRequest) returns (ProductSet) {};
 }
 
 message SearchRequest {

@@ -7,7 +7,7 @@ import { tokenToMetadata } from "../util/tokenToMetadata";
 const userClient = new UserClient(process.env.USER_ADDRESS ?? '', ChannelCredentials.createInsecure(), {})
 
 
-export class AuthClientStub {
+export class AuthClientImpl {
     auth(login: string, password: string, cb: UnaryCallback<TokenPair>) {
         userClient.Auth(new Credentials({login, password}),new Metadata({}),{},cb)
     }

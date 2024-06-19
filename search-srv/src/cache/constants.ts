@@ -1,0 +1,1 @@
+export const LISTING_HASH_KEY = 'listing'

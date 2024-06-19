@@ -24,6 +24,7 @@ services:
       SEARCH_ADDRESS: search:${GRPC_SEARCH_PORT}
       DOMAIN: ${DOMAIN}
       EXPRESS_ACCESS_CONTROL_ALLOW_ORIGIN: ${EXPRESS_ACCESS_CONTROL_ALLOW_ORIGIN}
+      REDIS_URL: ${REDIS_URL}
     ports:
       - 8080:8080
   auth:
@@ -37,6 +38,7 @@ services:
       DB_AUTH_HOST: db-auth
       DB_NAME: ${DB_NAME}
       GRPC_AUTH_PORT: ${GRPC_AUTH_PORT}
+      REDIS_URL: ${REDIS_URL}
     ports:
       - ${GRPC_AUTH_PORT_ACCESS}:${GRPC_AUTH_PORT}
     depends_on:
@@ -57,6 +59,7 @@ services:
       DB_HOST: db-products
       DB_NAME: ${DB_NAME}
       GRPC_PRODUCTS_PORT: ${GRPC_PRODUCTS_PORT}
+      REDIS_URL: ${REDIS_URL}
     ports:
       - ${GRPC_PRODUCTS_PORT_ACCESS}:${GRPC_PRODUCTS_PORT}
     depends_on:
@@ -77,6 +80,7 @@ services:
       DB_HOST: db-products
       DB_NAME: ${DB_NAME}
       GRPC_SEARCH_PORT: ${GRPC_SEARCH_PORT}
+      REDIS_URL: ${REDIS_URL}
     ports:
       - ${GRPC_SEARCH_PORT_ACCESS}:${GRPC_SEARCH_PORT}
     depends_on:
@@ -133,7 +137,6 @@ services:
       - redis:/root/redis
       # - /path/to/local/redis.conf:/usr/local/etc/redis/redis.conf
     environment:
-      - REDIS_PASSWORD=${REDIS_PASSOWRD}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_DATABASES=16
 volumes:

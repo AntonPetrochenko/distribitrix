@@ -301,14 +301,17 @@ export class ListingRequest extends pb_1.Message {
 export class ProductData extends pb_1.Message {
     #one_of_decls: number[][] = [];
     constructor(data?: any[] | {
+        id?: number;
         name?: string;
         data?: string;
         enabled?: boolean;
-        id?: number;
     }) {
         super();
         pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
         if (!Array.isArray(data) && typeof data == "object") {
+            if ("id" in data && data.id != undefined) {
+                this.id = data.id;
+            }
             if ("name" in data && data.name != undefined) {
                 this.name = data.name;
             }
@@ -318,10 +321,13 @@ export class ProductData extends pb_1.Message {
             if ("enabled" in data && data.enabled != undefined) {
                 this.enabled = data.enabled;
             }
-            if ("id" in data && data.id != undefined) {
-                this.id = data.id;
-            }
         }
+    }
+    get id() {
+        return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+    }
+    set id(value: number) {
+        pb_1.Message.setField(this, 1, value);
     }
     get name() {
         return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
@@ -341,19 +347,16 @@ export class ProductData extends pb_1.Message {
     set enabled(value: boolean) {
         pb_1.Message.setField(this, 4, value);
     }
-    get id() {
-        return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
-    }
-    set id(value: number) {
-        pb_1.Message.setField(this, 1, value);
-    }
     static fromObject(data: {
+        id?: number;
         name?: string;
         data?: string;
         enabled?: boolean;
-        id?: number;
     }): ProductData {
         const message = new ProductData({});
+        if (data.id != null) {
+            message.id = data.id;
+        }
         if (data.name != null) {
             message.name = data.name;
         }
@@ -363,18 +366,18 @@ export class ProductData extends pb_1.Message {
         if (data.enabled != null) {
             message.enabled = data.enabled;
         }
-        if (data.id != null) {
-            message.id = data.id;
-        }
         return message;
     }
     toObject() {
         const data: {
+            id?: number;
             name?: string;
             data?: string;
             enabled?: boolean;
-            id?: number;
         } = {};
+        if (this.id != null) {
+            data.id = this.id;
+        }
         if (this.name != null) {
             data.name = this.name;
         }
@@ -384,23 +387,20 @@ export class ProductData extends pb_1.Message {
         if (this.enabled != null) {
             data.enabled = this.enabled;
         }
-        if (this.id != null) {
-            data.id = this.id;
-        }
         return data;
     }
     serialize(): Uint8Array;
     serialize(w: pb_1.BinaryWriter): void;
     serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
         const writer = w || new pb_1.BinaryWriter();
+        if (this.id != 0)
+            writer.writeInt64(1, this.id);
         if (this.name.length)
             writer.writeString(2, this.name);
         if (this.data.length)
             writer.writeString(3, this.data);
         if (this.enabled != false)
             writer.writeBool(4, this.enabled);
-        if (this.id != 0)
-            writer.writeInt64(1, this.id);
         if (!w)
             return writer.getResultBuffer();
     }
@@ -410,6 +410,9 @@ export class ProductData extends pb_1.Message {
             if (reader.isEndGroup())
                 break;
             switch (reader.getFieldNumber()) {
+                case 1:
+                    message.id = reader.readInt64();
+                    break;
                 case 2:
                     message.name = reader.readString();
                     break;
@@ -418,9 +421,6 @@ export class ProductData extends pb_1.Message {
                     break;
                 case 4:
                     message.enabled = reader.readBool();
-                    break;
-                case 1:
-                    message.id = reader.readInt64();
                     break;
                 default: reader.skipField();
             }
@@ -456,22 +456,22 @@ export class ProductCreationData extends pb_1.Message {
         }
     }
     get name() {
-        return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
     }
     set name(value: string) {
-        pb_1.Message.setField(this, 2, value);
+        pb_1.Message.setField(this, 1, value);
     }
     get data() {
-        return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
     }
     set data(value: string) {
-        pb_1.Message.setField(this, 3, value);
+        pb_1.Message.setField(this, 2, value);
     }
     get enabled() {
-        return pb_1.Message.getFieldWithDefault(this, 4, false) as boolean;
+        return pb_1.Message.getFieldWithDefault(this, 3, false) as boolean;
     }
     set enabled(value: boolean) {
-        pb_1.Message.setField(this, 4, value);
+        pb_1.Message.setField(this, 3, value);
     }
     static fromObject(data: {
         name?: string;
@@ -512,11 +512,11 @@ export class ProductCreationData extends pb_1.Message {
     serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
         const writer = w || new pb_1.BinaryWriter();
         if (this.name.length)
-            writer.writeString(2, this.name);
+            writer.writeString(1, this.name);
         if (this.data.length)
-            writer.writeString(3, this.data);
+            writer.writeString(2, this.data);
         if (this.enabled != false)
-            writer.writeBool(4, this.enabled);
+            writer.writeBool(3, this.enabled);
         if (!w)
             return writer.getResultBuffer();
     }
@@ -526,13 +526,13 @@ export class ProductCreationData extends pb_1.Message {
             if (reader.isEndGroup())
                 break;
             switch (reader.getFieldNumber()) {
-                case 2:
+                case 1:
                     message.name = reader.readString();
                     break;
-                case 3:
+                case 2:
                     message.data = reader.readString();
                     break;
-                case 4:
+                case 3:
                     message.enabled = reader.readBool();
                     break;
                 default: reader.skipField();

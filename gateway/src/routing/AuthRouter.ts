@@ -1,5 +1,5 @@
 import { Response, Router } from "express";
-import { AuthClientStub } from "../grpc/AuthClientStub";
+import { AuthClientImpl } from "../grpc/AuthClientImpl";
 import { z } from "zod";
 import schema from "../zod/schema";
 import { validateAndDenyBadRequest } from "../util/validateAndDenyBadRequest";
@@ -26,7 +26,7 @@ function setTokenCookie(res: Response, name: string, token: string) {
 
 // для наглядности кладём это рядом. в нормальной ситуации будет ещё один класс,
 // который отвечает за сервис аутентификации и авторизации на уровне гейтвея
-const authClient = new AuthClientStub() 
+const authClient = new AuthClientImpl() 
 
 AuthRouter.post('/register', (req, res) => {
     // Каждый запрос может сначала сломаться с нашей стороны, затем что-то пойти не так в контуре микросервисов

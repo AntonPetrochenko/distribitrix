@@ -32,7 +32,7 @@ export class UserModel extends Model {
   static async byLogin(login: string) {
     return this.findOne({
       where: {
-        name
+        name: login
       }
     })
   }

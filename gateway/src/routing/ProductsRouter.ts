@@ -1,5 +1,5 @@
 import { Response, Router } from "express";
-import { ProductClientStub } from "../grpc/ProductClientStub";
+import { ProductClientImpl } from "../grpc/ProductClientImpl";
 import { z } from "zod";
 import schema from "../zod/schema";
 import { handleServiceFailure } from "../util/handleServiceFailure";
@@ -9,7 +9,7 @@ import { Message } from "google-protobuf";
 import { ServiceError } from "@grpc/grpc-js";
 import { COOKIE_TOKEN_AUTH } from "../util/constants";
 import { validateAndDenyBadRequest } from "../util/validateAndDenyBadRequest";
-import { AuthClientStub } from "../grpc/AuthClientStub";
+import { AuthClientImpl } from "../grpc/AuthClientImpl";
 import { protectWithAuthService } from "../middleware/auth";
 export const ProductsRouter = Router()
 
@@ -18,8 +18,8 @@ export const ProductsRouter = Router()
 // Я пишу в таком стиле для того, чтобы мои джуны наглядно видели, что откуда растёт, и какой нибудь Вася за бутерброд
 // 100% смог перенять мой код. Такой была моя работа последние 3 года.
 
-const productClient = new ProductClientStub()
-const authClient = new AuthClientStub()
+const productClient = new ProductClientImpl()
+const authClient = new AuthClientImpl()
 
 function handleProductRejection(status: Status, res: Response) {
     res.status(400).send({ // TODO: К сожалению, мы не обрабатываем 404 :(
@@ -29,12 +29,15 @@ function handleProductRejection(status: Status, res: Response) {
 
 function productStatusResponseHandler(err: ServiceError | null, data: Status | undefined, res: Response) {
     if (err) {
+        console.log('We have an err')
         handleServiceFailure(err, res)
     } else {
         if ( data && !data.ok ) {
+            console.log('We have a bad state')
             handleProductRejection(data, res)
         }
         if ( data ) {
+            console.log('Ok')
             res.status(201).send(data.toObject())
         }
     }
@@ -43,16 +46,20 @@ function productStatusResponseHandler(err: ServiceError | null, data: Status | u
 ProductsRouter.post('/', protectWithAuthService, (req, res) => {
     // Тут вадилация чуть умнее. В остальных случаях используем стандартный обработчик
     // Реализуем оба. Как сказано в стабе, когда нибудь может появиться разница, хоть сейчас её и нет
+    console.log('Using schema single!')
     const singleProduct = schema.ProductCreationSchema.safeParse(req.body)
     if (singleProduct.success) {
+        console.log('Using schema single!')
         productClient.create(singleProduct.data, (err, data) => {
             productStatusResponseHandler(err, data, res)
         })
     }
-
+    console.log('Trying schema bulk!')
     const bulkProducts = schema.BulkProductCreationSchema.safeParse(req.body)
     if (bulkProducts.success) {
+        console.log('Using schema bulk!')
         productClient.bulkCreate(bulkProducts.data, (err, data) => {
+            console.log('It is done', err)
             productStatusResponseHandler(err, data, res)
         })
     }

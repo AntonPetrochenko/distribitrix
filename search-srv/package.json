@@ -14,6 +14,7 @@
     "@types/sequelize": "^4.28.20",
     "mali": "github:malijs/mali#master",
     "pg": "^8.12.0",
+    "redis": "^4.6.14",
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.3",
     "sequelize-typescript": "^2.1.6",
